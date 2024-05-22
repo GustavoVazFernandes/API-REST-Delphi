@@ -13,12 +13,12 @@ type
    public
       constructor Create;
       destructor Destroy; override;
-      function  AdicionaVideo (Video : TVideo; Conteudo: TBytes) : Boolean;
-      function ExcluiVideo (IDVideo : TGUID) : Boolean;
-      function BuscaVideo (IDVideo : TGUID) : TVideo;
+      function  AdicionaVideo     (Video : TVideo; Conteudo: TBytes) : Boolean;
+      function ExcluiVideo        (IDVideo : TGUID) : Boolean;
+      function BuscaVideo         (IDVideo : TGUID) : TVideo;
       function BuscaConteudoVideo (IDVideo : TGUID) : TBytes;
-      function BuscaTodosVideos (IDServidor : TGUID) : TObjectList<TVideo>;
-      function ReciclarVideos (Dias : Integer) : Boolean;
+      function BuscaTodosVideos   (IDServidor : TGUID) : TObjectList<TVideo>;
+      function ReciclarVideos     (Dias : Integer) : Boolean;
 
 end;
 
@@ -89,7 +89,6 @@ begin
 
    if not DirectoryExists(VIDEO_PATH) then
       CreateDir(VIDEO_PATH);
-
 end;
 
 destructor TVideoBO.Destroy;

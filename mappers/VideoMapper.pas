@@ -45,11 +45,16 @@ end;
 
 class function TVideoMapper.ConverteParaObjeto(Body: TJSONObject): TVideo;
 begin
-   Result := TVideo.Create;
-
-   Result.ID := TGUID.NewGuid;
+   Result           := TVideo.Create;
+   Result.ID        := TGUID.NewGuid;
    Result.Descricao := Body.GetValue<string>('description', '');
-   Result.Conteudo := Body.GetValue<Integer>('sizeInBytes', 0);
+   Result.Conteudo  := Body.GetValue<Integer>('sizeInBytes', -1);
+
+   if Result.Descricao = '' then
+      FreeAndNil(Result)
+   else
+   if Result.Conteudo = -1 then
+      FreeAndNil(Result)
    
 end;
 

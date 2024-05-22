@@ -16,12 +16,12 @@ type
 
    public
       constructor Create;
-      function AdicionaVideo(Video : TVideo; Conteudo : TBytes) : Boolean;
-      function ExcluiVideo(IDVideo : TGUID) : Boolean;
+      function AdicionaVideo      (Video : TVideo; Conteudo : TBytes) : Boolean;
+      function ExcluiVideo        (IDVideo : TGUID) : Boolean;
       function BuscaConteudoVideo (IDVideo : TGUID) : TBytes;
-      function BuscaTodosVideos (IDServidor : TGUID) : TObjectList<TVideo>;
-      function ReciclarVideos (Dias : Integer) : Boolean;
-      function BuscaVideo (IDVideo : TGUID) : TVideo;
+      function BuscaTodosVideos   (IDServidor : TGUID) : TObjectList<TVideo>;
+      function ReciclarVideos     (Dias : Integer) : Boolean;
+      function BuscaVideo         (IDVideo : TGUID) : TVideo;
       function BuscaStatusReciclagem: TStatusReciclagem;
       procedure IniciaReciclagem;
 

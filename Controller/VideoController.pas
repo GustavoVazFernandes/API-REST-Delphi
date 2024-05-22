@@ -31,40 +31,39 @@ uses VideoMapper;
 procedure TVideoController.AdicionaVideo(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xVideo : TVideo;
-   xBody  : TJSONObject;
+   xVideo      : TVideo;
+   xBody       : TJSONObject;
    xIDServidor : TGUID;
-   xConteudo : TBytes;
+   xConteudo   : TBytes;
 begin
    xIDServidor := StringToGUID(Requisicao.Params['serverId']);
-   xBody  := Requisicao.Body<TJSONObject>;
+   xBody       := Requisicao.Body<TJSONObject>;
 
-   xVideo := TVideoMapper.ConverteParaObjeto(xBody);
+   xVideo            := TVideoMapper.ConverteParaObjeto(xBody);
    xVideo.IDServidor := xIDServidor;
 
    if vVideoDAO.AdicionaVideo(xVideo, xConteudo) then
-      Resposta.Send<TJSONObject>(TVideoMapper.ConverteParaJSON(xVideo)).Status(THTTPStatus.Created)
+      Resposta.Send<TJSONObject>(TVideoMapper.ConverteParaJSON(xVideo))
+         .Status(THTTPStatus.Created)
    else
-      Resposta.Status(THTTPStatus.BadRequest);
+      Resposta.Status(THTTPStatus.InternalServerError);
 end;
 
 procedure TVideoController.BuscaConteudoVideo(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xVideo : TVideo;
-   xIDVideo : TGUID;
+   xVideo     : TVideo;
+   xIDVideo   : TGUID;
    xJSONVideo : TJSONObject;
 begin
    xIDVideo := StringToGUID(Requisicao.Params['videoId']);
-   xVideo  := vVideoDAO.BuscaVideo(xIDVideo);
+   xVideo   := vVideoDAO.BuscaVideo(xIDVideo);
 
    if xVideo <> nil then
    begin
       xJSONVideo := TJSONObject.Create;
-
       xJSONVideo.AddPair('sizeInBytes', TJSONNumber.Create(xVideo.Conteudo));
       Resposta.Send<TJSONObject>(xJSONVideo).Status(THTTPStatus.OK);
-
    end
    else
       Resposta.Status(THTTPStatus.NotFound);
@@ -73,28 +72,24 @@ end;
 procedure TVideoController.BuscaTodosVideos(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xIDServer: TGUID;
-   xVariosVideos: TObjectList<TVideo>;
-   xJSONVideos: TJSONArray;
-   xVideo: TVideo;
-   xJSONVideo: TJSONObject;
+   xIDServer     : TGUID;
+   xVariosVideos : TObjectList<TVideo>;
 begin
-   xIDServer := StringToGUID(Requisicao.Params['serverId']);
+   xIDServer     := StringToGUID(Requisicao.Params['serverId']);
    xVariosVideos := vVideoDAO.BuscaTodosVideos(xIDServer);
 
    Resposta.Send<TJSONArray>(TVideoMapper.ConverteParaJSONLista(xVariosVideos))
       .Status(THTTPStatus.OK);
-
 end;
 
 procedure TVideoController.BuscaVideo(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xVideo: TVideo;
-   xIDVideo: TGUID;
+   xVideo   : TVideo;
+   xIDVideo : TGUID;
 begin
    xIDVideo := StringToGUID(Requisicao.Params['videoId']);
-   xVideo := vVideoDAO.BuscaVideo(xIDVideo);
+   xVideo   := vVideoDAO.BuscaVideo(xIDVideo);
 
    if xVideo <> nil then
    begin
@@ -121,7 +116,7 @@ end;
 procedure TVideoController.ReciclarVideos(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xDias: Integer;
+   xDias : Integer;
 begin
    xDias := StrToIntDef(Requisicao.Params['days'], 0);
 
@@ -150,7 +145,7 @@ end;
 procedure TVideoController.StatusReciclagem(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xJSONStatus: TJSONObject;
+   xJSONStatus : TJSONObject;
 begin
    xJSONStatus := TJSONObject.Create;
 

@@ -31,7 +31,7 @@ end;
 class function TServidorMapper.ConverteParaJSONLista(
   ListaServidores: TObjectList<TServidor>): TJSONArray;
 var
-   xServidor: TServidor;
+   xServidor : TServidor;
 begin
    Result := TJSONArray.Create;
 
@@ -43,12 +43,10 @@ end;
 
 class function TServidorMapper.ConverteParaObjeto(Body: TJSONObject): TServidor;
 begin
-   Result := TServidor.Create;
-
-   Result.ID := TGUID.NewGuid;
-
-   Result.Nome := Body.GetValue<string>('name', '');
-   Result.IP := Body.GetValue<string>('ip', '');
+   Result       := TServidor.Create;
+   Result.ID    := TGUID.NewGuid;
+   Result.Nome  := Body.GetValue<string>('name', '');
+   Result.IP    := Body.GetValue<string>('ip', '');
    Result.Porta := Body.GetValue<Integer>('port',-1);
 
    if Result.Nome = '' then

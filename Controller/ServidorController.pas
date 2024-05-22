@@ -13,10 +13,10 @@ type
 
    public
       procedure RegistraRotas;
-      procedure CriaServidor(Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure AtualizaServidor(Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure ExcluiServidor(Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure BuscaServidor(Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
+      procedure CriaServidor        (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
+      procedure AtualizaServidor    (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
+      procedure ExcluiServidor      (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
+      procedure BuscaServidor       (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
       procedure BuscaTodosServidores(Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
 
 end;
@@ -31,8 +31,8 @@ uses
 procedure TServidorController.AtualizaServidor(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xServidor : TServidor;
-   xBody : TJSONObject;
+   xServidor   : TServidor;
+   xBody       : TJSONObject;
    xIDServidor : TGUID;
 begin
    xIDServidor := StringToGUID(Requisicao.Params['id']);
@@ -40,9 +40,9 @@ begin
 
    if xServidor <> nil then
    begin
-      xBody := Requisicao.Body<TJSONObject>;
-      xServidor.Nome := xBody.GetValue<string>('name', '');
-      xServidor.IP := xBody.GetValue<string>('ip', '');
+      xBody           := Requisicao.Body<TJSONObject>;
+      xServidor.Nome  := xBody.GetValue<string>('name', '');
+      xServidor.IP    := xBody.GetValue<string>('ip', '');
       xServidor.Porta := xBody.GetValue<Integer>('port',0);
 
       if vServidorDAO.AtualizaServidor(xServidor) then
@@ -58,12 +58,11 @@ end;
 procedure TServidorController.BuscaServidor(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-   xJSONServidor : TJSONObject;
-   xServidor : TServidor;
-   xIDServidor : TGUID;
+   xServidor     : TServidor;
+   xIDServidor   : TGUID;
 begin
    xIDServidor := StringToGUID(Requisicao.Params['id']);
-   xServidor := vServidorDAO.BuscaServidor(xIDServidor);
+   xServidor   := vServidorDAO.BuscaServidor(xIDServidor);
 
    if xServidor <> nil then
    begin
@@ -93,9 +92,9 @@ procedure TServidorController.CriaServidor(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
    xServidor : TServidor;
-   xBody : TJSONObject;
+   xBody     : TJSONObject;
 begin
-   xBody := Requisicao.Body<TJSONObject>;
+   xBody     := Requisicao.Body<TJSONObject>;
    xServidor := TServidorMapper.ConverteParaObjeto(xBody);
 
    if xServidor = nil then

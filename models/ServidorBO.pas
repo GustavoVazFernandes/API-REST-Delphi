@@ -15,8 +15,8 @@ type
       destructor Destroy; override;
       function AdicionaServidor(Servidor: TServidor): Boolean;
       function AtualizaServidor(Servidor: TServidor): Boolean;
-      function RemoveServidor(IDServidor: TGUID): Boolean;
-      function BuscaServidor (IDServidor: TGUID) : TServidor;
+      function RemoveServidor  (IDServidor: TGUID): Boolean;
+      function BuscaServidor   (IDServidor: TGUID) : TServidor;
       function BuscaVariosServidores : TObjectList<TServidor>;
 
 end;
@@ -96,7 +96,6 @@ begin
    end
    else
       Result := False;
-
 end;
 
 end.

@@ -12,10 +12,10 @@ type
 
    public
       constructor Create;
-      function CriaServidor(Servidor: TServidor): Boolean;
+      function CriaServidor    (Servidor: TServidor): Boolean;
       function AtualizaServidor(Servidor: TServidor): Boolean;
-      function ExcluiServidor(IDServidor: TGUID): Boolean;
-      function BuscaServidor(IDServidor: TGUID): TServidor;
+      function ExcluiServidor  (IDServidor: TGUID): Boolean;
+      function BuscaServidor   (IDServidor: TGUID): TServidor;
       function BuscaTodosServidores: TObjectList<TServidor>;
 end;
 

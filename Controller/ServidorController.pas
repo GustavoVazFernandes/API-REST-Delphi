@@ -13,11 +13,12 @@ type
 
    public
       procedure RegistraRotas;
-      procedure CriaServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
-      procedure AtualizaServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
-      procedure ExcluiServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
-      procedure BuscaServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
-      procedure BuscaTodosServidores(Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure CriaServidor (Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure AtualizaServidor (Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure ExcluiServidor (Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure BuscaServidor (Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure BuscaTodosServidores (Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure BuscaStatusServidor (Requisicao: THorseRequest; Resposta: THorseResponse);
 
 end;
 
@@ -36,7 +37,7 @@ var
    xIDServidor : TGUID;
 begin
    try
-      xIDServidor := StringToGUID(Requisicao.Params['id']);
+      xIDServidor := StringToGUID(Requisicao.Params['serverId']);
    except
       on E: Exception do
       begin
@@ -71,7 +72,7 @@ var
    xIDServidor   : TGUID;
 begin
    try
-      xIDServidor := StringToGUID(Requisicao.Params['id']);
+      xIDServidor := StringToGUID(Requisicao.Params['serverId']);
    except
       on E: Exception do
       begin
@@ -86,6 +87,38 @@ begin
    begin
       Resposta.Send<TJSONObject>(TServidorMapper.ConverteParaJSON(xServidor))
          .Status(THTTPStatus.OK);
+   end
+   else
+      Resposta.Status(THTTPStatus.NotFound);
+end;
+
+procedure TServidorController.BuscaStatusServidor(Requisicao: THorseRequest;
+  Resposta: THorseResponse);
+var
+   xJSONStatus : TJSONObject;
+   xServidor   : TServidor;
+   xIDServidor   : TGUID;
+begin
+   try
+      xIDServidor := StringToGUID(Requisicao.Params['serverId']);
+   except
+      on E: Exception do
+      begin
+         Resposta.Status(THTTPStatus.BadRequest);
+         Exit;
+      end;
+   end;
+
+   xServidor   := vServidorDAO.BuscaServidor(xIDServidor);
+   xJSONStatus := TJSONObject.Create;
+
+   if xServidor <> nil then
+   begin
+      if vServidorDAO.BuscaStatusServidor(xIDServidor) = Disponivel then
+         xJSONStatus.AddPair('status', 'Disponivel')
+      else
+         xJSONStatus.AddPair('status', 'Indisponivel');
+         Resposta.Send<TJSONObject>(xJSONStatus).Status(THTTPStatus.OK);
    end
    else
       Resposta.Status(THTTPStatus.NotFound);
@@ -130,7 +163,7 @@ var
    xIDServidor : TGUID;
 begin
     try
-      xIDServidor := StringToGUID(Requisicao.Params['id']);
+      xIDServidor := StringToGUID(Requisicao.Params['serverId']);
    except
       on E: Exception do
       begin
@@ -150,10 +183,11 @@ begin
    vServidorDAO := TServidorDAO.Create;
 
    THorse.Post('/api/server', CriaServidor);
-   THorse.Put('/api/servers/:id', AtualizaServidor);
-   THorse.Delete('/api/servers/:id', ExcluiServidor);
-   THorse.Get('/api/servers/:id', BuscaServidor);
+   THorse.Put('/api/servers/:serverId', AtualizaServidor);
+   THorse.Delete('/api/servers/:serverId', ExcluiServidor);
+   THorse.Get('/api/servers/:serverId', BuscaServidor);
    THorse.Get('/api/servers', BuscaTodosServidores);
+   THorse.Get('/api/servers/available/:serverId', BuscaStatusServidor)
 end;
 
 end.

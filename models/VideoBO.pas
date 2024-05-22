@@ -6,19 +6,26 @@ uses
    Video, System.Generics.Collections, System.SysUtils, System.IOUtils;
 
 type
+   TStatusReciclagem = (rsNotRunning, rsRunning);
+
+type
    TVideoBO = Class
    private
       vVideos : TObjectList<TVideo>;
+      vStatusReciclagem : TStatusReciclagem;
 
    public
       constructor Create;
       destructor Destroy; override;
-      function AdicionaVideo      (Video : TVideo; Conteudo: TBytes) : Boolean;
-      function ExcluiVideo        (IDVideo : TGUID) : Boolean;
-      function BuscaVideo         (IDVideo : TGUID) : TVideo;
-      function BuscaConteudoVideo (IDVideo : TGUID) : TBytes;
-      function BuscaTodosVideos   (IDServidor : TGUID) : TObjectList<TVideo>;
-      function ReciclarVideos     (Dias : Integer) : Boolean;
+      function AdicionaVideo (Video : TVideo; Conteudo: TBytes) : Boolean;
+      function ExcluiVideo (IDVideo : TGUID) : Boolean;
+      function BuscaVideo (IDVideo : TGUID) : TVideo;
+      function BuscaTodosVideos (IDServidor : TGUID) : TObjectList<TVideo>;
+      function ReciclarVideos (Dias : Integer) : Boolean;
+      function BuscaStatusReciclagem : TStatusReciclagem;
+      procedure IniciaReciclagem;
+      procedure FimReciclagem;
+
 end;
 
 implementation
@@ -38,15 +45,9 @@ begin
    Result := True;
 end;
 
-function TVideoBO.BuscaConteudoVideo(IDVideo: TGUID): TBytes;
-var
-   xCaminhoArquivo : string;
+function TVideoBO.BuscaStatusReciclagem: TStatusReciclagem;
 begin
-   xCaminhoArquivo := TPath.Combine(VIDEO_PATH, IDVideo.ToString + '.bin');
-   if TFile.Exists(xCaminhoArquivo) then
-      Result := TFile.ReadAllBytes(xCaminhoArquivo)
-   else
-      Result := nil;
+   Result := vStatusReciclagem;
 end;
 
 function TVideoBO.BuscaTodosVideos(IDServidor: TGUID): TObjectList<TVideo>;
@@ -85,6 +86,7 @@ end;
 constructor TVideoBO.Create;
 begin
    vVideos := TObjectList<TVideo>.Create;
+   vStatusReciclagem := rsNotRunning;
 
    if not DirectoryExists(VIDEO_PATH) then
       CreateDir(VIDEO_PATH);
@@ -116,6 +118,16 @@ begin
    end;
 end;
  
+procedure TVideoBO.FimReciclagem;
+begin
+   vStatusReciclagem := rsNotRunning;
+end;
+
+procedure TVideoBO.IniciaReciclagem;
+begin
+   vStatusReciclagem := rsRunning;
+end;
+
 function TVideoBO.ReciclarVideos(Dias: Integer): Boolean;
 var
    xVideo: TVideo;
@@ -123,14 +135,16 @@ var
    xDataLimite: TDateTime;
 begin
    xDataLimite := Now - Dias;
+   IniciaReciclagem;
 
    for xVideo in vVideos do
    begin
       xCaminhoArquivo :=TPath.Combine(VIDEO_PATH, xVideo.ID.ToString + '.bin');
       if FileAge(xCaminhoArquivo) < xDataLimite then
       begin
-        TFile.Delete(xCaminhoArquivo);
-        vVideos.Remove(xVideo);
+         TFile.Delete(xCaminhoArquivo);
+         vVideos.Remove(xVideo);
+         FimReciclagem;
       end;
    end;
    Result := True;

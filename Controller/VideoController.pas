@@ -12,7 +12,7 @@ type
    vVideoDAO : TVideoDAO;
 
    public
-   procedure AdicionaVideo(Requisicao: THorseRequest; Resposta: THorseResponse);
+   procedure AdicionaVideo (Requisicao: THorseRequest; Resposta: THorseResponse);
    procedure ExcluiVideo(Requisicao: THorseRequest; Resposta: THorseResponse);
    procedure BuscaVideo(Requisicao: THorseRequest; Resposta: THorseResponse);
    procedure BuscaConteudoVideo(Requisicao: THorseRequest; Resposta: THorseResponse);
@@ -65,12 +65,12 @@ end;
 procedure TVideoController.BuscaConteudoVideo(Requisicao: THorseRequest;
   Resposta: THorseResponse);
 var
-   xVideo     : TVideo;
-   xIDVideo   : TGUID;
-   xJSONVideo : TJSONObject;
+   xVideoBytes: TBytes;
+   xIDVideo   : string;
+   xStream    : TFileStream;
 begin
    try
-      xIDVideo := StringToGUID(Requisicao.Params['videoId']);
+      xIDVideo := (Requisicao.Params['videoId']);
    except
       on E: Exception do
       begin
@@ -79,14 +79,9 @@ begin
       end;
    end;
 
-   xVideo   := vVideoDAO.BuscaVideo(xIDVideo);
-
-   if xVideo <> nil then
-   begin
-      xJSONVideo := TJSONObject.Create;
-      xJSONVideo.AddPair('sizeInBytes', TJSONNumber.Create(xVideo.Conteudo));
-      Resposta.Send<TJSONObject>(xJSONVideo).Status(THTTPStatus.OK);
-   end
+   xStream := TFileStream.Create(ExtractFilePath('video\') + xIDVideo + '.bin', fmOpenRead);
+   if xStream <> nil then
+      Resposta.Send<TStream>(xStream).Status(THTTPStatus.OK)
    else
       Resposta.Status(THTTPStatus.NotFound);
 end;
@@ -183,7 +178,6 @@ begin
    if vVideoDAO.ReciclarVideos(xDias) then
    begin
       Resposta.Status(THTTPStatus.NoContent);
-      vVideoDAO.IniciaReciclagem;
    end
    else
       Resposta.Status(THTTPStatus.BadRequest);
@@ -194,9 +188,9 @@ begin
    vVideoDAO := TVideoDAO.Create;
 
    THorse.Post('/api/servers/:serverID/videos', AdicionaVideo);
-   THorse.Delete('/api/servers/:serverId/videos/:videoId}', ExcluiVideo);
+   THorse.Delete('/api/servers/:serverId/videos/:videoId', ExcluiVideo);
    THorse.Get('/api/servers/:serverId/videos/:videoId', BuscaVideo);
-   THorse.Get('/api/videos/:videoId/content', BuscaConteudoVideo);
+   THorse.Get('/api/servers/:serverId/videos/:videoId/binary', BuscaConteudoVideo);
    THorse.Get('/api/servers/:serverID/videos', BuscaTodosVideos);
    THorse.Delete('/api/videos/recycle/:days', ReciclarVideos);
    THorse.Get('/api/recycler/status', StatusReciclagem);

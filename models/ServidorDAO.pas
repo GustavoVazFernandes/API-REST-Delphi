@@ -12,11 +12,12 @@ type
 
    public
       constructor Create;
-      function CriaServidor    (Servidor: TServidor): Boolean;
-      function AtualizaServidor(Servidor: TServidor): Boolean;
-      function ExcluiServidor  (IDServidor: TGUID): Boolean;
-      function BuscaServidor   (IDServidor: TGUID): TServidor;
+      function CriaServidor (Servidor: TServidor): Boolean;
+      function AtualizaServidor (Servidor: TServidor): Boolean;
+      function ExcluiServidor (IDServidor: TGUID): Boolean;
+      function BuscaServidor (IDServidor: TGUID): TServidor;
       function BuscaTodosServidores: TObjectList<TServidor>;
+      function BuscaStatusServidor (IDServidor : TGUID) : TStatusServidor;
 end;
 
 implementation
@@ -26,6 +27,11 @@ implementation
 function TServidorDAO.BuscaServidor(IDServidor: TGUID): TServidor;
 begin
    Result := vServidorBO.BuscaServidor(IDServidor);
+end;
+
+function TServidorDAO.BuscaStatusServidor(IDServidor : TGUID): TStatusServidor;
+begin
+   Result := vServidorBO.BuscaStatusServidor(IDServidor);
 end;
 
 function TServidorDAO.BuscaTodosServidores: TObjectList<TServidor>;

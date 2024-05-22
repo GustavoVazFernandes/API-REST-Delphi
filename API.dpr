@@ -8,6 +8,7 @@ uses
   System.SysUtils,
   Horse,
   Horse.Jhonson,
+  Horse.OctetStream,
   Horse.Commons,
   Horse.Exception,
   Servidor in 'models\Servidor.pas',
@@ -27,6 +28,7 @@ var
 
 begin
    THorse.Use(Jhonson());
+   THorse.Use(OctetStream);
 
    vServidorController := TServidorController.Create;
    vServidorController.RegistraRotas;

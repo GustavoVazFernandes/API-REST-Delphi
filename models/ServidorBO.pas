@@ -6,9 +6,13 @@ uses
    Servidor, System.Generics.Collections, System.SysUtils, System.JSON;
 
 type
+   TStatusServidor = (Disponivel, Indisponivel);
+
+type
    TServidorBO = Class
    private
       vServidores : TObjectList<TServidor>;
+      vStatusServidor : TStatusServidor;
 
    public
       constructor Create;
@@ -18,6 +22,7 @@ type
       function RemoveServidor  (IDServidor: TGUID): Boolean;
       function BuscaServidor   (IDServidor: TGUID) : TServidor;
       function BuscaVariosServidores : TObjectList<TServidor>;
+      function BuscaStatusServidor(IDServidor : TGUID) : TStatusServidor;
 
 end;
 
@@ -66,6 +71,16 @@ begin
    end;
 end;
 
+function TServidorBO.BuscaStatusServidor(IDServidor : TGUID): TStatusServidor;
+var
+   xServidor : TServidor;
+begin
+   xServidor := BuscaServidor(IDServidor);
+
+   if xServidor <> nil then
+      Result := vStatusServidor;
+end;
+
 function TServidorBO.BuscaVariosServidores: TObjectList<TServidor>;
 begin
    Result := vServidores;
@@ -74,6 +89,7 @@ end;
 constructor TServidorBO.Create;
 begin
    vServidores := TObjectList<TServidor>.Create;
+   vStatusServidor := Disponivel;
 end;
 
 destructor TServidorBO.Destroy;

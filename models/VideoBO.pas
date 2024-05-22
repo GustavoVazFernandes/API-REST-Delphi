@@ -13,7 +13,7 @@ type
    public
       constructor Create;
       destructor Destroy; override;
-      function  AdicionaVideo     (Video : TVideo; Conteudo: TBytes) : Boolean;
+      function AdicionaVideo      (Video : TVideo; Conteudo: TBytes) : Boolean;
       function ExcluiVideo        (IDVideo : TGUID) : Boolean;
       function BuscaVideo         (IDVideo : TGUID) : TVideo;
       function BuscaConteudoVideo (IDVideo : TGUID) : TBytes;

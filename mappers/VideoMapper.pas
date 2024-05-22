@@ -12,7 +12,7 @@ type
    public
       class function ConverteParaJSON (Video : TVideo) : TJSONObject;
       class function ConverteParaJSONLista (ListaVideos : TObjectList<TVideo>) : TJSONArray;
-      class function ConverteParaObjeto (Body : TJSONObject) : TVideo;
+      class function ConverteParaObjeto (Body : TJSONObject; IDServidor : TGUID) : TVideo;
 
 end;
 
@@ -43,19 +43,20 @@ begin
    end;
 end;
 
-class function TVideoMapper.ConverteParaObjeto(Body: TJSONObject): TVideo;
+class function TVideoMapper.ConverteParaObjeto(Body: TJSONObject;
+ IDServidor : TGUID): TVideo;
 begin
    Result           := TVideo.Create;
    Result.ID        := TGUID.NewGuid;
    Result.Descricao := Body.GetValue<string>('description', '');
    Result.Conteudo  := Body.GetValue<Integer>('sizeInBytes', -1);
+   Result.IDServidor:= IDServidor;
 
    if Result.Descricao = '' then
       FreeAndNil(Result)
    else
    if Result.Conteudo = -1 then
-      FreeAndNil(Result)
-   
+      FreeAndNil(Result);
 end;
 
 end.

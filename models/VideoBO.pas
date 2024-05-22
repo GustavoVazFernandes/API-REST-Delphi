@@ -19,7 +19,6 @@ type
       function BuscaConteudoVideo (IDVideo : TGUID) : TBytes;
       function BuscaTodosVideos   (IDServidor : TGUID) : TObjectList<TVideo>;
       function ReciclarVideos     (Dias : Integer) : Boolean;
-
 end;
 
 implementation

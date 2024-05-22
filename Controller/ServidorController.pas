@@ -13,11 +13,11 @@ type
 
    public
       procedure RegistraRotas;
-      procedure CriaServidor        (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure AtualizaServidor    (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure ExcluiServidor      (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure BuscaServidor       (Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
-      procedure BuscaTodosServidores(Requisicao: THorseRequest; Resposta: THorseResponse; Proximo: TProc);
+      procedure CriaServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure AtualizaServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure ExcluiServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure BuscaServidor(Requisicao: THorseRequest; Resposta: THorseResponse);
+      procedure BuscaTodosServidores(Requisicao: THorseRequest; Resposta: THorseResponse);
 
 end;
 
@@ -29,13 +29,22 @@ uses
 { TServidorController }
 
 procedure TServidorController.AtualizaServidor(Requisicao: THorseRequest;
-  Resposta: THorseResponse; Proximo: TProc);
+  Resposta: THorseResponse);
 var
    xServidor   : TServidor;
    xBody       : TJSONObject;
    xIDServidor : TGUID;
 begin
-   xIDServidor := StringToGUID(Requisicao.Params['id']);
+   try
+      xIDServidor := StringToGUID(Requisicao.Params['id']);
+   except
+      on E: Exception do
+      begin
+         Resposta.Status(THTTPStatus.BadRequest);
+         Exit;
+      end;
+   end;
+
    xServidor   := vServidorDAO.BuscaServidor(xIDServidor);
 
    if xServidor <> nil then
@@ -56,29 +65,34 @@ begin
 end;
 
 procedure TServidorController.BuscaServidor(Requisicao: THorseRequest;
-  Resposta: THorseResponse; Proximo: TProc);
+  Resposta: THorseResponse);
 var
    xServidor     : TServidor;
    xIDServidor   : TGUID;
 begin
-   xIDServidor := StringToGUID(Requisicao.Params['id']);
+   try
+      xIDServidor := StringToGUID(Requisicao.Params['id']);
+   except
+      on E: Exception do
+      begin
+         Resposta.Status(THTTPStatus.BadRequest);
+         Exit;
+      end;
+   end;
+
    xServidor   := vServidorDAO.BuscaServidor(xIDServidor);
 
    if xServidor <> nil then
    begin
-      try
-         Resposta.Send<TJSONObject>(TServidorMapper.ConverteParaJSON(xServidor)).Status(THTTPStatus.OK);
-      finally
-         if xServidor <> nil then
-            FreeAndNil(xServidor);
-      end;
+      Resposta.Send<TJSONObject>(TServidorMapper.ConverteParaJSON(xServidor))
+         .Status(THTTPStatus.OK);
    end
    else
-     Resposta.Status(THTTPStatus.NotFound);
+      Resposta.Status(THTTPStatus.NotFound);
 end;
 
 procedure TServidorController.BuscaTodosServidores(Requisicao: THorseRequest;
-  Resposta: THorseResponse; Proximo: TProc);
+  Resposta: THorseResponse);
 var
    xServidores: TObjectList<TServidor>;
 begin
@@ -89,7 +103,7 @@ begin
 end;
 
 procedure TServidorController.CriaServidor(Requisicao: THorseRequest;
-  Resposta: THorseResponse; Proximo: TProc);
+  Resposta: THorseResponse);
 var
    xServidor : TServidor;
    xBody     : TJSONObject;
@@ -111,11 +125,19 @@ begin
 end;
 
 procedure TServidorController.ExcluiServidor(Requisicao: THorseRequest;
-  Resposta: THorseResponse; Proximo: TProc);
+  Resposta: THorseResponse);
 var
    xIDServidor : TGUID;
 begin
-    xIDServidor := StringToGUID(Requisicao.Params['id']);
+    try
+      xIDServidor := StringToGUID(Requisicao.Params['id']);
+   except
+      on E: Exception do
+      begin
+         Resposta.Status(THTTPStatus.BadRequest);
+         Exit;
+      end;
+   end;
 
     if vServidorDAO.ExcluiServidor(xIDServidor) then
        Resposta.Status(THTTPStatus.NoContent)

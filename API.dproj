@@ -99,6 +99,7 @@
         <DCCReference Include="Controller\ServidorController.pas"/>
         <DCCReference Include="Controller\VideoController.pas"/>
         <DCCReference Include="mappers\ServidorMapper.pas"/>
+        <DCCReference Include="mappers\VideoMapper.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

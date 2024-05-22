@@ -24,6 +24,8 @@ end;
 
 implementation
 
+uses VideoMapper;
+
 { TVideoController }
 
 procedure TVideoController.AdicionaVideo(Requisicao: THorseRequest;
@@ -36,15 +38,12 @@ var
 begin
    xIDServidor := StringToGUID(Requisicao.Params['serverId']);
    xBody  := Requisicao.Body<TJSONObject>;
-   xVideo := TVideo.Create;
 
-   xVideo.ID := TGUID.NewGuid;
-   xVideo.Descricao := xBody.GetValue<string>('description', '');
-   xVideo.Conteudo := xBody.GetValue<Integer>('sizeInBytes', 0);
+   xVideo := TVideoMapper.ConverteParaObjeto(xBody);
    xVideo.IDServidor := xIDServidor;
-   xConteudo := TNetEncoding.Base64.DecodeStringToBytes(xBody.GetValue<string>('content', ''));
+
    if vVideoDAO.AdicionaVideo(xVideo, xConteudo) then
-      Resposta.Send(xVideo.ID.ToString).Status(THTTPStatus.Created)
+      Resposta.Send<TJSONObject>(TVideoMapper.ConverteParaJSON(xVideo)).Status(THTTPStatus.Created)
    else
       Resposta.Status(THTTPStatus.BadRequest);
 end;
@@ -63,10 +62,7 @@ begin
    begin
       xJSONVideo := TJSONObject.Create;
 
-      xJSONVideo.AddPair('id', xVideo.ID.ToString);
-      xJSONVideo.AddPair('description', xVideo.Descricao);
       xJSONVideo.AddPair('sizeInBytes', TJSONNumber.Create(xVideo.Conteudo));
-      xJSONVideo.AddPair('serverId', xVideo.IDServidor.ToString);
       Resposta.Send<TJSONObject>(xJSONVideo).Status(THTTPStatus.OK);
 
    end
@@ -85,18 +81,9 @@ var
 begin
    xIDServer := StringToGUID(Requisicao.Params['serverId']);
    xVariosVideos := vVideoDAO.BuscaTodosVideos(xIDServer);
-   xJSONVideos := TJSONArray.Create;
 
-   for xVideo in xVariosVideos do
-   begin
-     xJSONVideo := TJSONObject.Create;
-     xJSONVideo.AddPair('id', xVideo.ID.ToString);
-     xJSONVideo.AddPair('description', xVideo.Descricao);
-     xJSONVideo.AddPair('sizeInBytes', TJSONNumber.Create(xVideo.Conteudo));
-     xJSONVideo.AddPair('serverId', xVideo.IDServidor.ToString);
-     xJSONVideos.AddElement(xJSONVideo);
-   end;
-      Resposta.Send<TJSONArray>(xJSONVideos).Status(THTTPStatus.OK);
+   Resposta.Send<TJSONArray>(TVideoMapper.ConverteParaJSONLista(xVariosVideos))
+      .Status(THTTPStatus.OK);
 
 end;
 
@@ -105,21 +92,14 @@ procedure TVideoController.BuscaVideo(Requisicao: THorseRequest;
 var
    xVideo: TVideo;
    xIDVideo: TGUID;
-   xJSONVideo: TJSONObject;
 begin
    xIDVideo := StringToGUID(Requisicao.Params['videoId']);
    xVideo := vVideoDAO.BuscaVideo(xIDVideo);
 
    if xVideo <> nil then
    begin
-      xJSONVideo := TJSONObject.Create;
-
-      xJSONVideo.AddPair('id', xVideo.ID.ToString);
-      xJSONVideo.AddPair('description', xVideo.Descricao);
-      xJSONVideo.AddPair('sizeInBytes', TJSONNumber.Create(xVideo.Conteudo));
-      xJSONVideo.AddPair('serverId', xVideo.IDServidor.ToString);
-      Resposta.Send<TJSONObject>(xJSONVideo).Status(THTTPStatus.OK);
-
+      Resposta.Send<TJSONObject>(TVideoMapper.ConverteParaJSON(xVideo))
+         .Status(THTTPStatus.OK);
    end
    else
       Resposta.Status(THTTPStatus.NotFound);
@@ -131,6 +111,7 @@ var
    xIDVideo: TGUID;
 begin
    xIDVideo := StringToGUID(Requisicao.Params['videoId']);
+
    if vVideoDAO.ExcluiVideo(xIDVideo) then
       Resposta.Status(THTTPStatus.NoContent)
    else
@@ -143,8 +124,12 @@ var
    xDias: Integer;
 begin
    xDias := StrToIntDef(Requisicao.Params['days'], 0);
+
    if vVideoDAO.ReciclarVideos(xDias) then
-      Resposta.Status(THTTPStatus.NoContent)
+   begin
+      Resposta.Status(THTTPStatus.NoContent);
+      vVideoDAO.IniciaReciclagem;
+   end
    else
       Resposta.Status(THTTPStatus.BadRequest);
 end;
@@ -159,11 +144,21 @@ begin
    THorse.Get('/api/videos/:videoId/content', BuscaConteudoVideo);
    THorse.Get('/api/servers/:serverID/videos', BuscaTodosVideos);
    THorse.Delete('/api/videos/recycle/:days', ReciclarVideos);
+   THorse.Get('/api/recycler/status', StatusReciclagem);
 end;
 
 procedure TVideoController.StatusReciclagem(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
+var
+   xJSONStatus: TJSONObject;
 begin
+   xJSONStatus := TJSONObject.Create;
+
+   if vVideoDAO.BuscaStatusReciclagem = rsRunning then
+      xJSONStatus.AddPair('status', 'running')
+   else
+      xJSONStatus.AddPair('status', 'not running');
+      Resposta.Send<TJSONObject>(xJSONStatus).Status(THTTPStatus.OK);
 
 end;
 

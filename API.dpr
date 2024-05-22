@@ -18,7 +18,8 @@ uses
   VideoDAO in 'models\VideoDAO.pas',
   ServidorController in 'Controller\ServidorController.pas',
   VideoController in 'Controller\VideoController.pas',
-  ServidorMapper in 'mappers\ServidorMapper.pas';
+  ServidorMapper in 'mappers\ServidorMapper.pas',
+  VideoMapper in 'mappers\VideoMapper.pas';
 
 var
    vServidorController : TServidorController;

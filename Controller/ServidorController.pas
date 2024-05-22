@@ -53,7 +53,6 @@ begin
    end
    else
       Resposta.Status(THTTPStatus.NotFound);
-
 end;
 
 procedure TServidorController.BuscaServidor(Requisicao: THorseRequest;
@@ -82,7 +81,7 @@ end;
 procedure TServidorController.BuscaTodosServidores(Requisicao: THorseRequest;
   Resposta: THorseResponse; Proximo: TProc);
 var
-  xServidores: TObjectList<TServidor>;
+   xServidores: TObjectList<TServidor>;
 begin
    xServidores := vServidorDAO.BuscaTodosServidores;
 
@@ -97,7 +96,6 @@ var
    xBody : TJSONObject;
 begin
    xBody := Requisicao.Body<TJSONObject>;
-
    xServidor := TServidorMapper.ConverteParaObjeto(xBody);
 
    if xServidor = nil then
@@ -111,7 +109,6 @@ begin
          .Status(THTTPStatus.Created)
    else
       Resposta.Status(THTTPStatus.InternalServerError);
-
 end;
 
 procedure TServidorController.ExcluiServidor(Requisicao: THorseRequest;

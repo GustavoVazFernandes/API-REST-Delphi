@@ -48,7 +48,6 @@ begin
    end
    else
       Result := False;
-
 end;
 
 function TServidorBO.BuscaServidor(IDServidor: TGUID): TServidor;

@@ -21,11 +21,11 @@ implementation
 class function TServidorMapper.ConverteParaJSON(
   Servidor: TServidor): TJSONObject;
 begin
-     Result := TJSONObject.Create;
-     Result.AddPair('id', Servidor.ID.ToString);
-     Result.AddPair('name', Servidor.Nome);
-     Result.AddPair('ip', Servidor.IP);
-     Result.AddPair('port', TJSONNumber.Create(Servidor.Porta));
+   Result := TJSONObject.Create;
+   Result.AddPair('id', Servidor.ID.ToString);
+   Result.AddPair('name', Servidor.Nome);
+   Result.AddPair('ip', Servidor.IP);
+   Result.AddPair('port', TJSONNumber.Create(Servidor.Porta));
 end;
 
 class function TServidorMapper.ConverteParaJSONLista(
@@ -42,7 +42,6 @@ begin
 end;
 
 class function TServidorMapper.ConverteParaObjeto(Body: TJSONObject): TServidor;
-
 begin
    Result := TServidor.Create;
 
@@ -60,12 +59,6 @@ begin
    else
    if Result.Porta = -1 then
       FreeAndNil(Result)
-
-
-
-
-
-
 end;
 
 end.
